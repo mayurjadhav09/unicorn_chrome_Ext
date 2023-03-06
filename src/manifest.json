@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Reading time",
+  "version": "1.0.1",
+  "description": "Add the reading time to Chrome Extension documentation articles",
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.jpg"
+  },
+  "background": {
+    "service_worker": "backgroundScript.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": ["storage", "tabs", "scripting","webRequest"]
+}
