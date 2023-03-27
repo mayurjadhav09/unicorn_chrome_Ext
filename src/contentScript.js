@@ -1,95 +1,43 @@
-console.log("I am running in contentScript file.....", chrome)
-// console.log(chrome.webRequest)
-// let myFunction=()=>{
-//     setInterval(()=>{
-//         let newArray= document.getElementsByClassName("Zc1Emd QIJiHb")
-//         console.log(newArray)
-//         console.log('contentent--')
 
-//     },5000)
-// }
-// // myFunction();
-// {/* <input at-attr="input" autocomplete="on" name="email" required="required" id="input-19" type="email"></input> */}
-
-const observer = new MutationObserver(function (mutationsList, observer) {
-  // console.log(mutationsList)
-  for (let mutation of mutationsList) {
-    if (
-      mutation.type === "childList" ||
-      (mutation.type === "attributes" && mutation.addedNodes.length > 0)
-    ) {
-      // your code to handle the change on the web page
-      let data = []
-      let pageContent = document.querySelector("form")
-      for (var contentent of pageContent) {
-        if (contentent.value) {
-          let MsgObj = {
-            msg: contentent.value,
-            time: new Date().toLocaleTimeString(),
-            date: new Date().toLocaleDateString(),
-          }
-          data = [...data, MsgObj]
-        }
-
-        // send a message to the background script with the form data
-
-        // break;
-      }
-      chrome.runtime.sendMessage(
-        { type: "form-submitted", data: data },
-        (resp) => {
-          console.log(resp)
-        }
-      )
-      // console.log('================data===========',data)
-
-      break
-    }
+const observer = new MutationObserver((mutations) => {
+  // handle the mutations here
+  // console.log('DOM mutated!', mutations.);
+  for(let node of mutations){
+    console.log('mutation text content=',node.addedNodes)
   }
-})
-observer.observe(document.body, { childList: true, subtree: true })
 
-// declare a listener for the webRequest event
-// input.addEventListener("submit", function (event) {
-//   event.preventDefault()
+});
 
-//   // get the form data
-//   const formData = new FormData(event.target)
-//   const data = {}
-//   for (let [key, value] of formData.entries()) {
-//     data[key] = value
-//   }
+const observerOptions = {
+  childList: true, // observe changes to the list of children of the observed node
+  subtree: true, // observe changes to the entire subtree of the observed node
+  attributes: true, // observe changes to the attributes of the observed node
+  characterData: true, // observe changes to the text content of the observed node
+};
 
-//   // send a message to the background script with the form data
-//   chrome.runtime.sendMessage({ type: "form-submitted", data: data })
-// })
 
-// }
-// console.log('objjjjjjjjjjjjjjjjjjjjj',obj)
-//  console.log(' helllooooooooooooo entered......................',pageContent.innerText)
+function onPageLoad() {
+  // Your content script code here
+  // inputParent.closest('')
+  const targetNode = document.querySelector("#new_post_text_input");
+  const inputParent= document.querySelector('.v-text-field__slot')
+  const targetUserName = document.querySelector(".g-user-name.m-verified");
+  const sendBtn = document.querySelector(".g-btn.m-rounded.b-chat__btn-submit");
+  if (!targetNode || !targetUserName || !sendBtn) {
+    //The node we need does not exist yet.
+    //Wait 500ms and try again
+    window.setTimeout(onPageLoad, 500);
+    return;
+  } else {
+    console.log('content script is readyyyyyyyy.......')
 
-// .addEventListener("submit", function (event) {
-//   event.preventDefault()
+      // inputParent.addEventListener('input',handleEventInputevent,true)
+      observer.observe(inputParent, observerOptions);
+  }
+}
 
-//   const formData = new FormData(event.target)
-//   console.log('formData=============',formData)
-//   const data = {}
-//   for (let [key, value] of formData.entries()) {
-//     data[key] = value
-//   }
-//   console.log('data==========',data)
-//   return data
-//   // send a message to the background script with the form data
-// })
-//   chrome.runtime.sendMessage({ type: "form-submitted", data: pageContent })
+onPageLoad()
 
-//   let obj={}
-//   for (let input of pageContent) {
-//     console.log(
-//         "------------xcfxdytfuygiuoipo---",
-//         input?.value
-//       )
 
-//       break;
-//     }
-// chrome.runtime.sendMessage({ type: "form-submitted", data: input})
+
+
